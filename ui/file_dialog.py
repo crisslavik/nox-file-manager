@@ -223,7 +223,7 @@ class NOXFileDialog(QDialog):
         
         # File tree
         self.file_tree = QTreeWidget()
-        self.file_tree.setHeaderLabels(["Name", "Version", "Size", "Modified", "Type"])
+        self.file_tree.setHeaderLabels(["Name", "Task", "Version", "Size", "Updated"])
         self.file_tree.setAlternatingRowColors(True)
         self.file_tree.setSortingEnabled(True)
         self.file_tree.setSelectionMode(QTreeWidget.SingleSelection)
@@ -235,6 +235,10 @@ class NOXFileDialog(QDialog):
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+
+        # Header alignment
+        header.setDefaultAlignment(Qt.AlignCenter)
+        self.file_tree.headerItem().setTextAlignment(0, Qt.AlignLeft | Qt.AlignVCenter)
         
         layout.addWidget(self.file_tree)
         
@@ -443,20 +447,19 @@ class NOXFileDialog(QDialog):
         self.file_tree.clear()
         
         try:
-            # Add parent directory item
-            if directory != os.path.dirname(directory):  # Not root
-                parent_item = QTreeWidgetItem([".. (Parent Directory)", "", "", "", ""])
-                parent_item.setData(0, Qt.UserRole, os.path.dirname(directory))
-                parent_item.setForeground(0, QColor(100, 150, 255))
-                self.file_tree.addTopLevelItem(parent_item)
+            skip_dirs = {"publish"}
             
             # List directories
             items = []
             for entry in os.scandir(directory):
                 if entry.is_dir():
-                    item = QTreeWidgetItem([entry.name, "", "", "", "Directory"])
+                    if entry.name.lower() in skip_dirs:
+                        continue
+                    item = QTreeWidgetItem([entry.name, "", "", "", ""])
                     item.setData(0, Qt.UserRole, entry.path)
                     item.setForeground(0, QColor(150, 150, 255))
+                    for col in range(1, 5):
+                        item.setTextAlignment(col, Qt.AlignCenter)
                     items.append(item)
             
             # List files
@@ -469,15 +472,25 @@ class NOXFileDialog(QDialog):
                             continue
                     
                     file_info = FileInfo(entry.path)
+
+                    # Infer task (fallback) from filename: SH0010_comp_v004.ma -> Comp
+                    task = file_info.metadata.get('task')
+                    if not task:
+                        import re
+                        m = re.search(r'^[^_]+_([^_]+)_v\d+', file_info.name)
+                        task = m.group(1) if m else "-"
+                    task = task.replace('-', ' ').replace('_', ' ').strip().title() if task and task != "-" else "-"
                     
                     item = QTreeWidgetItem([
                         file_info.name,
+                        task,
                         f"v{file_info.version:03d}" if file_info.version > 0 else "-",
                         file_info.get_size_str(),
                         file_info.get_date_str(),
-                        os.path.splitext(entry.name)[1][1:].upper() or "File"
                     ])
                     item.setData(0, Qt.UserRole, entry.path)
+                    for col in range(1, 5):
+                        item.setTextAlignment(col, Qt.AlignCenter)
                     items.append(item)
             
             self.file_tree.addTopLevelItems(items)
@@ -506,7 +519,8 @@ class NOXFileDialog(QDialog):
             
             # Check filter
             if filter_ext != "All Files" and not filename.endswith(filter_ext.replace("*", "").lower()):
-                if item.text(4) != "Directory":  # Don't hide directories
+                # Don't hide directories
+                if not os.path.isdir(item.data(0, Qt.UserRole)):
                     item.setHidden(True)
                     continue
             

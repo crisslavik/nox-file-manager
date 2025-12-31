@@ -297,7 +297,9 @@
         }
 
         .file-item {
-            display: flex;
+            display: grid;
+            grid-template-columns: 28px 1fr 80px 70px 70px 120px;
+            column-gap: 8px;
             align-items: center;
             padding: 8px 12px;
             border-bottom: 1px solid #333;
@@ -313,10 +315,71 @@
             background: #0d5aa7;
         }
 
+        .file-item.selected .file-name {
+            color: #fff;
+        }
+
+        .file-item.selected .file-task,
+        .file-item.selected .file-version,
+        .file-item.selected .file-size,
+        .file-item.selected .file-date {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .file-header {
+            display: grid;
+            grid-template-columns: 28px 1fr 80px 70px 70px 120px;
+            column-gap: 8px;
+            align-items: center;
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #444;
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .file-header .file-icon {
+            visibility: hidden; /* Hide but take up space */
+        }
+
+        .file-header .file-name {
+            font-weight: 600;
+            color: #999;
+        }
+
+        .file-header .file-task {
+            font-weight: 600;
+            color: #999;
+        }
+
+        .file-header .file-version {
+            font-weight: 600;
+            color: #999;
+        }
+
+        .file-header .file-size {
+            font-weight: 600;
+            color: #999;
+        }
+
+        .file-header .file-date {
+            font-weight: 600;
+            color: #999;
+        }
+
+        .file-header .file-task,
+        .file-header .file-version,
+        .file-header .file-size,
+        .file-header .file-date {
+            text-align: center;
+        }
+
         .file-icon {
             width: 20px;
             height: 20px;
-            margin-right: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,25 +391,33 @@
             font-weight: 500;
         }
 
-        .file-version {
+        .file-task {
+            width: 80px;
             color: #888;
-            font-size: 11px;
-            margin-left: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .file-version {
+            width: 70px;
+            color: #0d5aa7;
+            font-weight: 600;
+            font-size: 12px;
+            text-align: center;
         }
 
         .file-size {
+            width: 70px;
             color: #888;
             font-size: 11px;
-            margin-left: 8px;
-            width: 60px;
-            text-align: right;
+            text-align: center;
         }
 
         .file-date {
+            width: 120px;
             color: #888;
             font-size: 11px;
-            margin-left: 8px;
-            width: 120px;
+            text-align: center;
         }
 
         .file-type {
@@ -740,58 +811,74 @@
                         <option>USD Files</option>
                     </select>
                 </div>
+                
+                <!-- File Header Bar -->
+                <div class="file-header">
+                    <div class="file-icon"></div>
+                    <div class="file-name header-name">Name</div>
+                    <div class="file-task header-task">Task</div>
+                    <div class="file-version header-version">Version</div>
+                    <div class="file-size header-size">Size</div>
+                    <div class="file-date header-updated">Updated</div>
+                </div>
+                
                 <div class="file-list" id="file-list">
                     <!-- Files would be populated here -->
-                    <div class="file-item">
-                        <div class="file-icon">📁</div>
-                        <div class="file-name">..</div>
-                        <div class="file-size">-</div>
-                        <div class="file-date">-</div>
-                        <div class="file-version">-</div>
-                        <div class="file-type">Directory</div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon">📁</div>
-                        <div class="file-name">publish</div>
-                        <div class="file-size">-</div>
-                        <div class="file-date">-</div>
-                        <div class="file-version">-</div>
-                        <div class="file-version"></div>
-                        <div class="file-size"></div>
-                        <div class="file-date"></div>
-                        <div class="file-type">Directory</div>
-                    </div>
                     <div class="file-item selected">
                         <div class="file-icon">📄</div>
                         <div class="file-name">SH0010_comp_v004.ma</div>
+                        <div class="file-task">Comp</div>
                         <div class="file-version">v004</div>
                         <div class="file-size">2.4 MB</div>
                         <div class="file-date">2024-12-30 14:32</div>
-                        <div class="file-type">MA</div>
                     </div>
                     <div class="file-item">
                         <div class="file-icon">📄</div>
                         <div class="file-name">SH0010_comp_v003.ma</div>
+                        <div class="file-task">Comp</div>
                         <div class="file-version">v003</div>
                         <div class="file-size">2.3 MB</div>
                         <div class="file-date">2024-12-30 11:15</div>
-                        <div class="file-type">MA</div>
                     </div>
                     <div class="file-item">
                         <div class="file-icon">📄</div>
                         <div class="file-name">SH0010_comp_v002.ma</div>
+                        <div class="file-task">Comp</div>
                         <div class="file-version">v002</div>
                         <div class="file-size">2.2 MB</div>
                         <div class="file-date">2024-12-29 16:45</div>
-                        <div class="file-type">MA</div>
                     </div>
                     <div class="file-item">
                         <div class="file-icon">📄</div>
                         <div class="file-name">SH0010_comp_v001.ma</div>
+                        <div class="file-task">Comp</div>
                         <div class="file-version">v001</div>
                         <div class="file-size">2.1 MB</div>
                         <div class="file-date">2024-12-29 10:20</div>
-                        <div class="file-type">MA</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_anim_v002.ma</div>
+                        <div class="file-task">Animation</div>
+                        <div class="file-version">v002</div>
+                        <div class="file-size">3.1 MB</div>
+                        <div class="file-date">2024-12-29 15:30</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_anim_v001.ma</div>
+                        <div class="file-task">Animation</div>
+                        <div class="file-version">v001</div>
+                        <div class="file-size">3.0 MB</div>
+                        <div class="file-date">2024-12-28 09:15</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_lighting_v001.ma</div>
+                        <div class="file-task">Lighting</div>
+                        <div class="file-version">v001</div>
+                        <div class="file-size">4.2 MB</div>
+                        <div class="file-date">2024-12-27 14:20</div>
                     </div>
                 </div>
             </div>
@@ -937,10 +1024,11 @@
                     const fileSize = this.querySelector('.file-size').textContent;
                     const fileDate = this.querySelector('.file-date').textContent;
                     const fileVersion = this.querySelector('.file-version').textContent;
+                    const fileTask = this.querySelector('.file-task').textContent;
                     
                     if (!fileName.includes('Directory') && !fileName.includes('..')) {
                         selectedFile = fileName;
-                        updateDetailsPanel(fileName, fileSize, fileDate, fileVersion);
+                        updateDetailsPanel(fileName, fileSize, fileDate, fileVersion, fileTask);
                     } else {
                         selectedFile = null;
                     }
@@ -962,11 +1050,27 @@
             }
 
             // Update details panel
-            function updateDetailsPanel(fileName, fileSize, fileDate, fileVersion) {
+            function updateDetailsPanel(fileName, fileSize, fileDate, fileVersion, fileTask) {
                 document.querySelector('.file-filename').textContent = fileName;
                 document.querySelector('.file-size .info-value').textContent = fileSize;
                 document.querySelector('.file-date .info-value').textContent = fileDate;
                 document.querySelector('.version .info-value').textContent = fileVersion;
+                
+                // Add Task info if not already present
+                let taskRow = document.querySelector('.task-row');
+                if (!taskRow) {
+                    const infoPanel = document.querySelector('.info-panel .file-info');
+                    const versionRow = document.querySelector('.info-row:has(.version)');
+                    const newTaskRow = document.createElement('div');
+                    newTaskRow.className = 'info-row task-row';
+                    newTaskRow.innerHTML = `
+                        <span class="info-label">Task:</span>
+                        <span class="info-value">${fileTask}</span>
+                    `;
+                    infoPanel.insertBefore(newTaskRow, versionRow);
+                } else {
+                    taskRow.querySelector('.info-value').textContent = fileTask;
+                }
             }
 
             // Load functionality
@@ -1005,10 +1109,15 @@
             filterSelect.addEventListener('change', function() {
                 const filter = this.value;
                 fileItems.forEach(item => {
-                    const fileType = item.querySelector('.file-type').textContent;
                     const fileName = item.querySelector('.file-name').textContent;
+                    const fileTask = item.querySelector('.file-task').textContent;
                     
-                    if (filter === 'All Files' || fileType === filter || fileName.includes('Directory')) {
+                    // Filter by file extension or task
+                    if (filter === 'All Files' || 
+                        (filter === 'Maya Files' && fileName.endsWith('.ma')) ||
+                        (filter === 'Nuke Scripts' && fileName.endsWith('.nk')) ||
+                        (filter === 'Houdini Scenes' && fileName.endsWith('.hip')) ||
+                        (filter === 'USD Files' && fileName.endsWith('.usd'))) {
                         item.style.display = 'flex';
                     } else {
                         item.style.display = 'none';
