@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOX File Manager - UI Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .window {
+            width: 1200px;
+            height: 800px;
+            background: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            margin: 20px auto;
+        }
+
+        .titlebar {
+            background: #1e1e1e;
+            padding: 8px 12px;
+            border-bottom: 1px solid #444;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f56; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #27c93f; }
+
+        .navbar {
+            background: #333;
+            padding: 16px 20px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: nowrap;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            background: #444;
+            border: 1px solid #555;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .nav-btn:hover {
+            background: #555;
+        }
+
+        .toolbar {
+            background: #333;
+            padding: 8px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button {
+            background: #444;
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background: #555;
+        }
+
+        .path-input {
+            flex: 1;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+
+        .pipeline-dropdowns {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pipeline-dropdown {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            min-width: 110px;
+            max-width: 130px;
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .load-buttons-simple {
+            display: flex;
+            gap: 12px;
+        }
+
+        .load-buttons-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .btn-load {
+            background: #0d5aa7;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-load:hover {
+            background: #0e6bbf;
+        }
+
+        .btn-load[data-mode="open"] {
+            background: #e74c3c;
+        }
+
+        .btn-load[data-mode="open"]:hover {
+            background: #c0392b;
+        }
+
+        .btn-load[data-mode="import"] {
+            background: #3498db;
+        }
+
+        .btn-load[data-mode="import"]:hover {
+            background: #2980b9;
+        }
+
+        .btn-load[data-mode="reference"] {
+            background: #9b59b6;
+        }
+
+        .btn-load[data-mode="reference"]:hover {
+            background: #8e44ad;
+        }
+
+        .recent-select {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            min-width: 150px;
+        }
+
+        .search-input {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 200px;
+        }
+
+        .recent-dropdown {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .browser-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #444;
+        }
+
+        .filter-bar {
+            background: #333;
+            padding: 8px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .filter-select {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .file-search-bar {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #2a2a2a;
+            border-bottom: 1px solid #444;
+            align-items: center;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #2b2b2b;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .file-item:hover {
+            background: #333;
+        }
+
+        .file-item.selected {
+            background: #0d5aa7;
+        }
+
+        .file-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .file-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .file-version {
+            color: #888;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .file-size {
+            color: #888;
+            font-size: 11px;
+            margin-left: 8px;
+            width: 60px;
+            text-align: right;
+        }
+
+        .file-date {
+            color: #888;
+            font-size: 11px;
+            margin-left: 8px;
+            width: 120px;
+        }
+
+        .file-type {
+            color: #666;
+            font-size: 11px;
+            margin-left: 8px;
+            width: 80px;
+        }
+
+        .details-section {
+            width: 400px;
+            background: #2b2b2b;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .info-panel {
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin: 12px 12px 6px 12px;
+            padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .panel-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .file-info {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .file-filename {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .file-path {
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #fff;
+        }
+
+        .preview-panel {
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin: 6px 12px 12px 12px;
+            padding: 12px;
+            flex: 0 0 220px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-area {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+            min-height: 0;
+        }
+
+        .metadata-panel {
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin: 12px;
+            padding: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .metadata-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .options-section {
+            background: #333;
+            border-top: 1px solid #444;
+            padding: 12px;
+        }
+
+        .options-group {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .options-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .radio-input {
+            accent-color: #0d5aa7;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .checkbox-input {
+            accent-color: #0d5aa7;
+        }
+
+        .load-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .load-btn {
+            flex: 1;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .load-btn:hover {
+            background: #333;
+            border-color: #0d5aa7;
+            transform: translateY(-2px);
+        }
+
+        .load-btn.active {
+            background: #0d5aa7;
+            border-color: #0e6bbf;
+        }
+
+        .load-btn.open-btn.active {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+
+        .load-btn.import-btn.active {
+            background: #3498db;
+            border-color: #2980b9;
+        }
+
+        .load-btn.reference-btn.active {
+            background: #9b59b6;
+            border-color: #8e44ad;
+        }
+
+        .btn-icon {
+            font-size: 24px;
+        }
+
+        .btn-text {
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .btn-desc {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.2;
+        }
+
+        .load-btn:hover .btn-desc {
+            color: #ccc;
+        }
+
+        .load-btn.active .btn-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .advanced-options {
+            display: flex;
+            gap: 20px;
+            padding-top: 12px;
+            border-top: 1px solid #444;
+        }
+
+        .filename-input {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        .actions-section {
+            background: #333;
+            border-top: 1px solid #444;
+            padding: 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel {
+            background: #444;
+            color: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: #555;
+        }
+
+        .btn-primary {
+            background: #0d5aa7;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0e6bbf;
+        }
+
+        .btn-primary:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        /* Dark theme scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <!-- Title Bar -->
+        <div class="titlebar">
+            <div class="title">NOX Load - Maya</div>
+            <div class="window-controls">
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+                <div class="window-control close"></div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navbar">
+            <div class="nav-group">
+                <div class="pipeline-dropdowns">
+                    <select class="pipeline-dropdown">
+                        <option>Show: NOX_Studios</option>
+                        <option>Show: Demo_Project</option>
+                    </select>
+                    <select class="pipeline-dropdown">
+                        <option>Episode: EP001</option>
+                        <option>Episode: EP002</option>
+                    </select>
+                    <select class="pipeline-dropdown">
+                        <option>Sequence: SQ010</option>
+                        <option>Sequence: SQ020</option>
+                    </select>
+                    <select class="pipeline-dropdown">
+                        <option>Shot: SH0010</option>
+                        <option>Shot: SH0011</option>
+                        <option>Asset: Character_Hero</option>
+                    </select>
+                    <select class="pipeline-dropdown">
+                        <option>Task: Comp</option>
+                        <option>Task: Animation</option>
+                        <option>Task: Modeling</option>
+                        <option>Task: Lighting</option>
+                    </select>
+                </div>
+                <div class="filter-controls">
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input">
+                        <span>My Tasks Only</span>
+                    </label>
+                </div>
+            </div>
+            <div class="nav-group">
+                <select class="recent-select">
+                    <option>Recent Shots/Assets</option>
+                    <option>SH0010 - Comp</option>
+                    <option>SH0005 - Animation</option>
+                    <option>Character_Hero - Modeling</option>
+                    <option>Environment_City - Lighting</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- File Browser -->
+            <div class="browser-section">
+                <div class="file-search-bar">
+                    <input type="text" class="search-input" placeholder="Search files...">
+                    <select class="filter-select">
+                        <option>All Files</option>
+                        <option>Maya Files</option>
+                        <option>Nuke Scripts</option>
+                        <option>Houdini Scenes</option>
+                        <option>USD Files</option>
+                    </select>
+                </div>
+                <div class="file-list" id="file-list">
+                    <!-- Files would be populated here -->
+                    <div class="file-item">
+                        <div class="file-icon">📁</div>
+                        <div class="file-name">..</div>
+                        <div class="file-size">-</div>
+                        <div class="file-date">-</div>
+                        <div class="file-version">-</div>
+                        <div class="file-type">Directory</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📁</div>
+                        <div class="file-name">publish</div>
+                        <div class="file-size">-</div>
+                        <div class="file-date">-</div>
+                        <div class="file-version">-</div>
+                        <div class="file-version"></div>
+                        <div class="file-size"></div>
+                        <div class="file-date"></div>
+                        <div class="file-type">Directory</div>
+                    </div>
+                    <div class="file-item selected">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_comp_v004.ma</div>
+                        <div class="file-version">v004</div>
+                        <div class="file-size">2.4 MB</div>
+                        <div class="file-date">2024-12-30 14:32</div>
+                        <div class="file-type">MA</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_comp_v003.ma</div>
+                        <div class="file-version">v003</div>
+                        <div class="file-size">2.3 MB</div>
+                        <div class="file-date">2024-12-30 11:15</div>
+                        <div class="file-type">MA</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_comp_v002.ma</div>
+                        <div class="file-version">v002</div>
+                        <div class="file-size">2.2 MB</div>
+                        <div class="file-date">2024-12-29 16:45</div>
+                        <div class="file-type">MA</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">SH0010_comp_v001.ma</div>
+                        <div class="file-version">v001</div>
+                        <div class="file-size">2.1 MB</div>
+                        <div class="file-date">2024-12-29 10:20</div>
+                        <div class="file-type">MA</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Panel -->
+            <div class="details-section">
+                <!-- File Information -->
+                <div class="info-panel">
+                    <div class="panel-title">File Information</div>
+                    <div class="file-info">
+                        <div class="file-filename">SH0010_comp_v004.ma</div>
+                        <div class="file-path">Path: /mnt/projects/show_001/shots/SQ010/SH0010/comp/work/maya/SH0010_comp_v004.ma</div>
+                        <div class="info-row">
+                            <span class="info-label">Size:</span>
+                            <span class="info-value">2.4 MB</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Modified:</span>
+                            <span class="info-value">2024-12-30 14:32:15</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Version:</span>
+                            <span class="info-value">v004</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Frame Range:</span>
+                            <span class="info-value">1001-1200</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">FPS:</span>
+                            <span class="info-value">24</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Software:</span>
+                            <span class="info-value">Maya 2024</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">User:</span>
+                            <span class="info-value">slavik</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Render Engine:</span>
+                            <span class="info-value">Arnold</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Scene Objects:</span>
+                            <span class="info-value">156 total</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Meshes:</span>
+                            <span class="info-value">23</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Cameras:</span>
+                            <span class="info-value">3</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Lights:</span>
+                            <span class="info-value">8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="preview-panel">
+                    <div class="panel-title">Preview</div>
+                    <div class="preview-area">
+                        No preview available
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options-section">
+            <div class="options-group">
+                <div class="options-title">Load Options</div>
+                <div class="load-buttons-row">
+                    <div class="load-buttons-simple">
+                        <button class="btn btn-load" data-mode="open">Open Scene</button>
+                        <button class="btn btn-load" data-mode="import">Import</button>
+                        <button class="btn btn-load" data-mode="reference">Reference</button>
+                    </div>
+                    <button class="btn btn-cancel">Cancel</button>
+                </div>
+                <div class="advanced-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input">
+                        <span>Load with validation</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input" checked>
+                        <span>Show load progress</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive prototype functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileItems = document.querySelectorAll('.file-item');
+            const loadButtons = document.querySelectorAll('.btn-load');
+            const cancelButton = document.querySelector('.btn-cancel');
+            const searchInput = document.querySelector('.search-input');
+            const filterSelect = document.querySelector('.filter-select');
+            const pipelineDropdowns = document.querySelectorAll('.pipeline-dropdown');
+            
+            let selectedFile = null;
+            let selectedMode = 'open';
+
+            // Load button selection and immediate action
+            loadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (selectedFile) {
+                        selectedMode = this.dataset.mode;
+                        loadFile();
+                    }
+                });
+            });
+
+            // Pipeline dropdown changes
+            pipelineDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function() {
+                    // In real app, this would update the file browser based on pipeline selection
+                    console.log('Pipeline changed:', this.value);
+                    updateFileBrowser();
+                });
+            });
+
+            // File selection
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove previous selection
+                    fileItems.forEach(f => f.classList.remove('selected'));
+                    
+                    // Add selection to clicked item
+                    this.classList.add('selected');
+                    
+                    // Update details panel (in real app, this would load actual file info)
+                    const fileName = this.querySelector('.file-name').textContent;
+                    const fileSize = this.querySelector('.file-size').textContent;
+                    const fileDate = this.querySelector('.file-date').textContent;
+                    const fileVersion = this.querySelector('.file-version').textContent;
+                    
+                    if (!fileName.includes('Directory') && !fileName.includes('..')) {
+                        selectedFile = fileName;
+                        updateDetailsPanel(fileName, fileSize, fileDate, fileVersion);
+                    } else {
+                        selectedFile = null;
+                    }
+                });
+
+                // Double click to open with default mode
+                item.addEventListener('dblclick', function() {
+                    if (selectedFile && !this.querySelector('.file-name').textContent.includes('Directory')) {
+                        selectedMode = 'open';
+                        loadFile();
+                    }
+                });
+            });
+
+            // Update file browser based on pipeline selection
+            function updateFileBrowser() {
+                // In real app, this would fetch files based on pipeline context
+                console.log('Updating file browser for pipeline selection...');
+            }
+
+            // Update details panel
+            function updateDetailsPanel(fileName, fileSize, fileDate, fileVersion) {
+                document.querySelector('.file-filename').textContent = fileName;
+                document.querySelector('.file-size .info-value').textContent = fileSize;
+                document.querySelector('.file-date .info-value').textContent = fileDate;
+                document.querySelector('.version .info-value').textContent = fileVersion;
+            }
+
+            // Load functionality
+            function loadFile() {
+                if (selectedFile) {
+                    const modeMessages = {
+                        'open': `Opening scene: ${selectedFile}`,
+                        'import': `Importing file: ${selectedFile}`,
+                        'reference': `Creating reference to: ${selectedFile}`
+                    };
+                    alert(modeMessages[selectedMode]);
+                    // In real app, this would trigger the actual file load with the selected mode
+                }
+            }
+
+            // Cancel button handler
+            cancelButton.addEventListener('click', function() {
+                alert('Cancelled');
+                // In real app, this would close the dialog
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                fileItems.forEach(item => {
+                    const fileName = item.querySelector('.file-name').textContent.toLowerCase();
+                    if (fileName.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Filter functionality
+            filterSelect.addEventListener('change', function() {
+                const filter = this.value;
+                fileItems.forEach(item => {
+                    const fileType = item.querySelector('.file-type').textContent;
+                    const fileName = item.querySelector('.file-name').textContent;
+                    
+                    if (filter === 'All Files' || fileType === filter || fileName.includes('Directory')) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Navigation buttons
+            document.querySelector('.nav-button').addEventListener('click', function() {
+                console.log('Navigation clicked');
+                // In real app, this would handle navigation
+            });
+
+            // Window controls
+            document.querySelector('.close').addEventListener('click', function() {
+                alert('Close window');
+            });
+
+            document.querySelector('.minimize').addEventListener('click', function() {
+                alert('Minimize window');
+            });
+
+            document.querySelector('.maximize').addEventListener('click', function() {
+                alert('Maximize window');
+            });
+        });
+    </script>
+</body>
+</html>

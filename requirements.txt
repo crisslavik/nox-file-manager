@@ -1,0 +1,22 @@
+# Core dependencies
+PySide6>=6.5.0
+PyYAML>=6.0
+pathlib2>=2.3.0
+
+# ShotGrid integration
+shotgun-api3>=3.0.0
+
+# DCC-specific (optional, will be imported only when available)
+# Maya - installed with Maya
+# Nuke - installed with Nuke
+# Houdini - installed with Houdini
+
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Optional: For thumbnail generation
+Pillow>=9.0.0
+opencv-python>=4.5.0

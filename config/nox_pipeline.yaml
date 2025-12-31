@@ -1,0 +1,32 @@
+# config/nox_pipeline.yaml
+"""
+NOX VFX Pipeline Configuration
+"""
+
+project_root: /mnt/projects
+shotgrid:
+  url: https://nox.shotgridstudio.com
+  project_id: 123
+  
+file_manager:
+  auto_version: true
+  backup_enabled: true
+  backup_count: 5
+  validate_on_load: true
+  metadata_enabled: true
+
+path_templates:
+  shot_work: "{project_root}/shots/{sequence}/{shot}/{step}/work/{software}/{shot}_{step}_v{version}.{ext}"
+  shot_publish: "{project_root}/shots/{sequence}/{shot}/{step}/publish/{software}/{shot}_{step}_v{version}.{ext}"
+  asset_work: "{project_root}/assets/{asset_type}/{asset}/{step}/work/{software}/{asset}_{step}_v{version}.{ext}"
+  asset_publish: "{project_root}/assets/{asset_type}/{asset}/{step}/publish/{software}/{asset}_{step}_v{version}.{ext}"
+
+software_extensions:
+  nuke: nk
+  houdini: hip
+  maya: ma
+  blender: blend
+  mocha: mocha
+  silhouette: sfx
+  3dequalizer: 3de
+  substance_painter: spp
