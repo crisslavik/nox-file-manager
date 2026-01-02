@@ -133,8 +133,12 @@ class NOXFileDialog(QDialog):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
         
-        # Top section: Path navigation
-        layout.addWidget(self._create_navigation_section())
+        # Pipeline navigation (for both load and save)
+        if self.mode == "save":
+            layout.addWidget(self._create_pipeline_navigation())
+        else:
+            # Top section: Path navigation (load mode only)
+            layout.addWidget(self._create_navigation_section())
         
         # Main splitter: File browser and details
         splitter = QSplitter(Qt.Horizontal)
@@ -144,7 +148,10 @@ class NOXFileDialog(QDialog):
         layout.addWidget(splitter)
         
         # Bottom section: Options and actions
-        layout.addWidget(self._create_options_section())
+        if self.mode == "save":
+            layout.addWidget(self._create_save_options())
+        else:
+            layout.addWidget(self._create_options_section())
         layout.addWidget(self._create_actions_section())
         
         self.setLayout(layout)
@@ -196,6 +203,59 @@ class NOXFileDialog(QDialog):
         self.btn_refresh.setToolTip("Refresh")
         layout.addWidget(self.btn_refresh)
         
+        widget.setLayout(layout)
+        return widget
+    
+    def _create_pipeline_navigation(self) -> QWidget:
+        """Create pipeline navigation for Save mode"""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(20)
+        
+        # Left: Pipeline dropdowns
+        left_widget = QWidget()
+        left_layout = QHBoxLayout()
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(8)
+        
+        self.show_combo = QComboBox()
+        self.show_combo.addItems(["SHOW_001"])
+        self.show_combo.setMinimumWidth(110)
+        left_layout.addWidget(self.show_combo)
+        
+        self.sequence_combo = QComboBox()
+        self.sequence_combo.addItems(["SQ010"])
+        self.sequence_combo.setMinimumWidth(110)
+        left_layout.addWidget(self.sequence_combo)
+        
+        self.shot_combo = QComboBox()
+        self.shot_combo.addItems(["SH0010"])
+        self.shot_combo.setMinimumWidth(110)
+        left_layout.addWidget(self.shot_combo)
+        
+        self.task_combo = QComboBox()
+        self.task_combo.addItems(["Comp", "Modeling", "Animation", "Lighting"])
+        self.task_combo.setCurrentText("Comp")
+        self.task_combo.setMinimumWidth(110)
+        left_layout.addWidget(self.task_combo)
+        
+        left_widget.setLayout(left_layout)
+        layout.addWidget(left_widget)
+        
+        # Right: Filter checkbox
+        right_widget = QWidget()
+        right_layout = QHBoxLayout()
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.my_tasks_checkbox = QCheckBox("My Tasks Only")
+        self.my_tasks_checkbox.setChecked(True)
+        right_layout.addWidget(self.my_tasks_checkbox)
+        
+        right_widget.setLayout(right_layout)
+        layout.addWidget(right_widget)
+        
+        layout.addStretch()
         widget.setLayout(layout)
         return widget
     
@@ -278,40 +338,42 @@ class NOXFileDialog(QDialog):
         self.lbl_version = QLabel("Version: -")
         info_layout.addWidget(self.lbl_version)
         
+        # Add Preview only for Load mode
+        if self.mode == "load":
+            # Add spacing between File Information and Preview
+            layout.addSpacing(6)
+            
+            # Thumbnail
+            thumbnail_group = QGroupBox("Preview")
+            thumbnail_layout = QVBoxLayout()
+            
+            self.lbl_thumbnail = QLabel("No preview available")
+            self.lbl_thumbnail.setAlignment(Qt.AlignCenter)
+            self.lbl_thumbnail.setMinimumSize(250, 250)
+            self.lbl_thumbnail.setStyleSheet("background-color: #2b2b2b; border: 1px solid #555;")
+            thumbnail_layout.addWidget(self.lbl_thumbnail)
+            
+            thumbnail_group.setLayout(thumbnail_layout)
+            layout.addWidget(thumbnail_group)
+            
+            # Add spacing between Preview and Metadata
+            layout.addSpacing(6)
+            
+            # Metadata
+            metadata_group = QGroupBox("Metadata")
+            metadata_layout = QVBoxLayout()
+            
+            self.metadata_text = QTextEdit()
+            self.metadata_text.setReadOnly(True)
+            self.metadata_text.setMaximumHeight(150)
+            metadata_layout.addWidget(self.metadata_text)
+            
+            metadata_group.setLayout(metadata_layout)
+            layout.addWidget(metadata_group)
+        
         info_layout.addStretch()
         info_group.setLayout(info_layout)
         layout.addWidget(info_group)
-        
-        # Add spacing between File Information and Preview
-        layout.addSpacing(6)
-        
-        # Thumbnail
-        thumbnail_group = QGroupBox("Preview")
-        thumbnail_layout = QVBoxLayout()
-        
-        self.lbl_thumbnail = QLabel("No preview available")
-        self.lbl_thumbnail.setAlignment(Qt.AlignCenter)
-        self.lbl_thumbnail.setMinimumSize(250, 250)
-        self.lbl_thumbnail.setStyleSheet("background-color: #2b2b2b; border: 1px solid #555;")
-        thumbnail_layout.addWidget(self.lbl_thumbnail)
-        
-        thumbnail_group.setLayout(thumbnail_layout)
-        layout.addWidget(thumbnail_group)
-        
-        # Add spacing between Preview and Metadata
-        layout.addSpacing(6)
-        
-        # Metadata
-        metadata_group = QGroupBox("Metadata")
-        metadata_layout = QVBoxLayout()
-        
-        self.metadata_text = QTextEdit()
-        self.metadata_text.setReadOnly(True)
-        self.metadata_text.setMaximumHeight(150)
-        metadata_layout.addWidget(self.metadata_text)
-        
-        metadata_group.setLayout(metadata_layout)
-        layout.addWidget(metadata_group)
         
         layout.addStretch()
         
@@ -380,6 +442,74 @@ class NOXFileDialog(QDialog):
         widget.setLayout(layout)
         return widget
     
+    def _create_save_options(self) -> QWidget:
+        """Create Save Options section matching prototype"""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        save_group = QGroupBox("Save Options")
+        save_layout = QVBoxLayout()
+        
+        # Filename suffix
+        suffix_layout = QHBoxLayout()
+        suffix_layout.addWidget(QLabel("Filename suffix:"))
+        suffix_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.suffix_input = QLineEdit()
+        self.suffix_input.setPlaceholderText("Optional (e.g. clientReview)")
+        suffix_layout.addWidget(self.suffix_input)
+        
+        save_layout.addLayout(suffix_layout)
+        
+        # Version dropdown
+        version_layout = QHBoxLayout()
+        version_layout.addWidget(QLabel("Version:"))
+        version_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.version_combo = QComboBox()
+        self.version_combo.setMinimumWidth(150)
+        self.version_combo.addItems(["v005 (Next)", "v004", "v003", "v002", "v001"])
+        version_layout.addWidget(self.version_combo)
+        
+        save_layout.addLayout(version_layout)
+        
+        # Checkbox and buttons row
+        actions_layout = QHBoxLayout()
+        actions_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Left: checkboxes
+        checkbox_layout = QHBoxLayout()
+        checkbox_layout.setSpacing(16)
+        
+        self.auto_increment_checkbox = QCheckBox("Increment version automatically")
+        self.auto_increment_checkbox.setChecked(True)
+        checkbox_layout.addWidget(self.auto_increment_checkbox)
+        
+        actions_layout.addLayout(checkbox_layout)
+        actions_layout.addStretch()
+        
+        # Right: buttons
+        self.btn_validate = QPushButton("Validate")
+        self.btn_validate.setMinimumWidth(80)
+        self.btn_validate.setStyleSheet("background-color: #27ae60; color: white;")
+        actions_layout.addWidget(self.btn_validate)
+        
+        actions_layout.addSpacing(10)
+        
+        self.btn_save = QPushButton("Save")
+        self.btn_save.setMinimumWidth(80)
+        self.btn_save.setEnabled(False)
+        self.btn_save.setStyleSheet("background-color: #0d5aa7; color: white;")
+        actions_layout.addWidget(self.btn_save)
+        
+        save_layout.addLayout(actions_layout)
+        save_group.setLayout(save_layout)
+        layout.addWidget(save_group)
+        
+        widget.setLayout(layout)
+        return widget
+    
     def _create_actions_section(self) -> QWidget:
         """Create action buttons section"""
         widget = QWidget()
@@ -393,16 +523,22 @@ class NOXFileDialog(QDialog):
         self.btn_cancel.setMinimumWidth(100)
         layout.addWidget(self.btn_cancel)
         
+        # Validate button (Save mode only)
+        if self.mode == "save":
+            # Already added in save options, skip here
+            pass
+        
         # Main action button
         if self.mode == "load":
             self.btn_action = QPushButton("Load")
             self.btn_action.setMinimumWidth(100)
         else:
-            self.btn_action = QPushButton("Save")
-            self.btn_action.setMinimumWidth(100)
+            # Use btn_save from save options
+            self.btn_action = self.btn_save
         
         self.btn_action.setDefault(True)
-        layout.addWidget(self.btn_action)
+        if self.mode == "load":
+            layout.addWidget(self.btn_action)
         
         widget.setLayout(layout)
         return widget
@@ -426,11 +562,18 @@ class NOXFileDialog(QDialog):
         
         # Actions
         self.btn_cancel.clicked.connect(self.reject)
-        self.btn_action.clicked.connect(self._on_action_clicked)
+        if self.mode == "load":
+            self.btn_action.clicked.connect(self._on_action_clicked)
+        else:
+            self.btn_save.clicked.connect(self._on_action_clicked)
+            self.btn_validate.clicked.connect(self._on_validate_clicked)
         
         # Options
         if self.mode == "load":
             self.radio_open.toggled.connect(self._on_load_mode_changed)
+        else:
+            self.auto_increment_checkbox.toggled.connect(self._on_auto_increment_toggled)
+            self.version_combo.currentTextChanged.connect(self._on_version_changed)
     
     def _navigate_to_directory(self, path: str):
         """Navigate to a directory"""
@@ -752,6 +895,24 @@ class NOXFileDialog(QDialog):
             }
         """)
     
+    def _on_validate_clicked(self):
+        """Handle Validate button click"""
+        # In a real implementation, this would validate the file path, permissions, etc.
+        # For now, just enable the Save button
+        self.btn_save.setEnabled(True)
+        self.btn_save.setStyleSheet("background-color: #27ae60; color: white;")
+    
+    def _on_auto_increment_toggled(self, checked: bool):
+        """Handle auto-increment checkbox toggle"""
+        if checked:
+            # Auto-select next version
+            self.version_combo.setCurrentIndex(0)
+    
+    def _on_version_changed(self, text: str):
+        """Handle version dropdown change"""
+        # Update UI based on version selection
+        pass
+    
     def get_result(self) -> Dict[str, Any]:
         """Get dialog result"""
         result = {
@@ -761,9 +922,14 @@ class NOXFileDialog(QDialog):
         if self.mode == "load":
             result['load_mode'] = self.load_mode
         else:
-            result['create_backup'] = self.create_backup
-            result['auto_version'] = self.auto_version
-            result['save_metadata'] = self.save_metadata
+            result['suffix'] = self.suffix_input.text()
+            result['version'] = self.version_combo.currentText()
+            result['auto_increment'] = self.auto_increment_checkbox.isChecked()
+            result['show'] = self.show_combo.currentText()
+            result['sequence'] = self.sequence_combo.currentText()
+            result['shot'] = self.shot_combo.currentText()
+            result['task'] = self.task_combo.currentText()
+            result['my_tasks_only'] = self.my_tasks_checkbox.isChecked()
         
         return result
 

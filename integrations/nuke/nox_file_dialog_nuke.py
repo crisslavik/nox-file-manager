@@ -5,7 +5,9 @@ NOX File Dialog integration for Nuke
 
 import nuke
 import nukescripts
+import os
 from ui.file_dialog import NOXFileDialog
+from integrations.nuke.nox_save_dialog import NOXSaveDialogNuke
 from dcc.nuke_file_manager import NukeFileManager
 
 # Initialize file manager
@@ -47,22 +49,41 @@ def show_load_dialog():
 
 def show_save_dialog():
     """Show NOX save dialog for Nuke"""
-    dialog = NOXFileDialog(
-        mode="save",
-        dcc_name="Nuke",
-        file_extensions=[".nk"],
+    dialog = NOXSaveDialogNuke(
         current_file=nuke.root().name()
     )
     
-    if dialog.exec() == NOXFileDialog.Accepted:
+    if dialog.exec() == NOXSaveDialogNuke.Accepted:
         result = dialog.get_result()
         
         try:
-            # Use file manager for saving with options
+            # Build file path with version and suffix
+            file_path = result['file_path']
+            if result['suffix']:
+                base_path = os.path.splitext(file_path)[0]
+                ext = os.path.splitext(file_path)[1]
+                file_path = f"{base_path}_{result['suffix']}{ext}"
+            
+            # Handle version increment
+            if result['auto_increment']:
+                # Extract next version from result
+                version_str = result['version']
+                if '(Next)' in version_str:
+                    import re
+                    m = re.search(r'v(\d+)', version_str)
+                    if m:
+                        next_version = int(m.group(1))
+                        base_path = os.path.splitext(file_path)[0]
+                        # Use .nknc extension if compression is enabled
+                        ext = '.nknc' if result['compress_script'] else '.nk'
+                        file_path = f"{base_path}_v{next_version:03d}{ext}"
+            
+            # Use file manager for saving with Nuke-specific options
             save_result = file_manager.save_file(
-                result['file_path'],
-                backup=result['create_backup'],
-                auto_version=result['auto_version'],
+                file_path,
+                compress_script=result['compress_script'],
+                backup_previous=result['backup_previous'],
+                save_comp_script_only=result['save_comp_script_only'],
                 metadata={'user_note': 'Saved via NOX dialog'}
             )
             

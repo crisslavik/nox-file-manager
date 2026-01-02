@@ -8,6 +8,7 @@ import maya.OpenMayaUI as omui
 from PySide6.QtWidgets import QWidget, QMessageBox
 from shiboken6 import wrapInstance
 from ui.file_dialog import NOXFileDialog
+from integrations.maya.nox_save_dialog import NOXSaveDialogMaya
 from dcc.maya_file_manager import MayaFileManager
 
 # Initialize file manager
@@ -89,23 +90,44 @@ def show_load_dialog():
 
 def show_save_dialog():
     """Show NOX save dialog for Maya"""
-    dialog = NOXFileDialog(
-        mode="save",
-        dcc_name="Maya",
-        file_extensions=[".ma", ".mb"],
+    dialog = NOXSaveDialogMaya(
         current_file=cmds.file(q=True, sn=True),
         parent=maya_main_window()
     )
     
-    if dialog.exec() == NOXFileDialog.Accepted:
+    if dialog.exec() == NOXSaveDialogMaya.Accepted:
         result = dialog.get_result()
         
         try:
+            # Build file path with version and suffix
+            file_path = result['file_path']
+            if result['suffix']:
+                base_path = os.path.splitext(file_path)[0]
+                ext = os.path.splitext(file_path)[1]
+                file_path = f"{base_path}_{result['suffix']}{ext}"
+            
+            # Handle version increment
+            if result['auto_increment']:
+                # Extract next version from result
+                version_str = result['version']
+                if '(Next)' in version_str:
+                    import re
+                    m = re.search(r'v(\d+)', version_str)
+                    if m:
+                        next_version = int(m.group(1))
+                        base_path = os.path.splitext(file_path)[0]
+                        ext = os.path.splitext(file_path)[1]
+                        file_path = f"{base_path}_v{next_version:03d}{ext}"
+            
+            # Determine file type
+            file_type = result['file_type']
+            
             save_result = file_manager.save_file(
-                result['file_path'],
-                backup=result['create_backup'],
-                auto_version=result['auto_version'],
-                metadata={'saved_by': 'NOX_Dialog'}
+                file_path,
+                file_type=file_type,
+                keep_history=result['keep_history'],
+                optimize_scene=result['optimize_scene'],
+                backup_previous=result.get('backup_previous', True)
             )
             
             if save_result.success:
